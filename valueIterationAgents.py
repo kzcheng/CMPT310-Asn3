@@ -77,6 +77,7 @@ class ValueIterationAgent(ValueEstimationAgent):
     def runValueIteration(self):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+
         stateList = self.mdp.getStates()
         for i in range(self.iterations):
             newValues = util.Counter()
@@ -106,6 +107,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
+
         if VERBOSE:
             logging.getLogger().setLevel(logging.DEBUG)
 
@@ -131,15 +133,16 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         for potentialNextState in potentialNextStates:
             nextState = potentialNextState[0]
-            logging.debug(f"nextState = {nextState}")
+            # logging.debug(f"nextState = {nextState}")
             probability = potentialNextState[1]
             reward = self.mdp.getReward(state, action, nextState)
+
             # if probability == 0:    # meaningless optimization
             #     continue
             totalQValue += probability * (reward + self.discount * self.getValue(nextState))
-            logging.debug(f"self.getValue(nextState) = {self.getValue(nextState)}")
+            # logging.debug(f"self.getValue(nextState) = {self.getValue(nextState)}")
 
-        logging.debug(f"totalQValue = {totalQValue}")
+        # logging.debug(f"totalQValue = {totalQValue}")
 
         logging.getLogger().setLevel(logging.INFO)
         return totalQValue
@@ -154,6 +157,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+
         if VERBOSE:
             logging.getLogger().setLevel(logging.DEBUG)
 
@@ -168,12 +172,12 @@ class ValueIterationAgent(ValueEstimationAgent):
         # logging.debug(f"self.mdp.isTerminal(state) = {self.mdp.isTerminal(state)}")
 
         # Main Logic of Method
-        logging.debug("\n\n")
-        called("computeActionFromValues")
-        logging.debug(f"state (current) = {state}")
+        # logging.debug("\n\n")
+        # called("computeActionFromValues")
+        # logging.debug(f"state (current) = {state}")
 
         actions = self.mdp.getPossibleActions(state)
-        logging.debug(f"actions = self.mdp.getPossibleActions(state) = {self.mdp.getPossibleActions(state)}")
+        # logging.debug(f"actions = self.mdp.getPossibleActions(state) = {self.mdp.getPossibleActions(state)}")
         if not actions:
             return None
 
@@ -181,17 +185,17 @@ class ValueIterationAgent(ValueEstimationAgent):
         bestValue = float('-inf')
 
         for action in actions:
-            logging.debug(f"action = {action}")
+            # logging.debug(f"action = {action}")
 
             valueOfAction = self.getQValue(state, action)
 
-            logging.debug(f"valueOfAction = {valueOfAction}")
+            # logging.debug(f"valueOfAction = {valueOfAction}")
 
             if valueOfAction > bestValue:
                 bestAction = action
                 bestValue = valueOfAction
 
-        logging.debug(f"bestAction = {bestAction}")
+        # logging.debug(f"bestAction = {bestAction}")
 
         logging.getLogger().setLevel(logging.INFO)
         return bestAction
