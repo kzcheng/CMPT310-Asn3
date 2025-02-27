@@ -23,10 +23,10 @@ import logging
 
 # Debug tags
 VERBOSE = False
-VERBOSE = True
+# VERBOSE = True
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
-logging.getLogger().setLevel(logging.DEBUG)
+# logging.getLogger().setLevel(logging.DEBUG)
 
 # Question 6: Q-Learning
 
@@ -100,6 +100,9 @@ class QLearningAgent(ReinforcementAgent):
         # So we should only return a single value here
 
         "*** YOUR CODE HERE ***"
+        # Figured out the issue. The problem is, getQValue is called at an unfortunate time. In ApproximateQAgent, getQValue is upgraded into something else, which means we are no longer allowed to call it when the state is terminal.
+        if len(self.getLegalActions(state)) == 0:
+            return 0.0
         return self.getQValue(state, self.getPolicy(state))
 
     def computeActionFromQValues(self, state):
@@ -322,7 +325,10 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
+        logging.debug(f"state = {state}")
         featureVector = self.featExtractor.getFeatures(state, action)
+
+        # Q(s, a) = Sum from i=1 to n ( fi(s, a) * wi )
         logging.debug(f"self.weights * featureVector = {self.weights * featureVector}")
         return self.weights * featureVector
 
@@ -333,8 +339,13 @@ class ApproximateQAgent(PacmanQAgent):
         "*** YOUR CODE HERE ***"
         featureVector = self.featExtractor.getFeatures(state, action)
         logging.debug(f"featureVector = {featureVector}")
-        difference = (reward + self.discount * self.getValue(nextState)) - self.getQValue(state, action)
+
+        # difference = (reward + gamma * max_a'(Q(s', a'))) - Q(s, a)
+        difference = (reward + self.discount * self.getValue(nextState)) \
+            - self.getQValue(state, action)
+
         for feature in featureVector:
+            # wi <- wi + alpha * difference * fi(s, a)
             self.weights[feature] += self.alpha * difference * featureVector[feature]
 
     def final(self, state):
