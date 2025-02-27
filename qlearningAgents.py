@@ -25,6 +25,9 @@ import logging
 VERBOSE = False
 VERBOSE = True
 
+logging.basicConfig(level=logging.INFO, format='%(message)s')
+logging.getLogger().setLevel(logging.DEBUG)
+
 # Question 6: Q-Learning
 
 # Note that your value iteration agent does not actually learn from experience. Rather, it ponders its MDP model to arrive at a complete policy before ever interacting with a real environment. When it does interact with the environment, it simply follows the precomputed policy (e.g. it becomes a reflex agent). This distinction may be subtle in a simulated environment like a Gridword, but it’s very important in the real world, where the real MDP is not available.
@@ -259,6 +262,42 @@ class PacmanQAgent(QLearningAgent):
         self.doAction(state, action)
         return action
 
+# Question 10: Approximate Q-Learning
+
+# Implement an approximate Q-learning agent that learns weights for features of states, where many states might share the same features. Write your implementation in ApproximateQAgent class in qlearningAgents.py, which is a subclass of PacmanQAgent.
+
+# Note: Approximate Q-learning assumes the existence of a feature function f(s, a) over state and action pairs, which yields a vector [f1(s, a), ..., fi(s, a), ..., fn(s, a) of feature values.
+# We provide feature functions for you in featureExtractors.py. Feature vectors are util.Counter (like a dictionary) objects containing the non-zero pairs of features and values; all omitted features have value zero.
+# So, instead of an vector where the index in the vector defines which feature is which, we have the keys in the dictionary define the identity of the feature.
+
+# The approximate Q-function takes the following form:
+#   Q(s, a) = Sum from i=1 to n ( fi(s, a) * wi )
+# where each weight wi is associated with a particular feature fi(s, a).
+# In your code, you should implement the weight vector as a dictionary mapping features (which the feature extractors will return) to weight values.
+
+# You will update your weight vectors similarly to how you updated Q-values:
+#   wi <- wi + alpha * difference * fi(s, a)
+#   difference = (reward + gamma * max_a'(Q(s', a'))) - Q(s, a)
+
+# Note that the difference term is the same as in normal Q-learning, and reward is the experienced reward.
+
+# By default, ApproximateQAgent uses the IdentityExtractor, which assigns a single feature to every (state,action) pair.
+# With this feature extractor, your approximate Q-learning agent should work identically to PacmanQAgent. You can test this with the following command:
+#   python pacman.py -p ApproximateQAgent -x 2000 -n 2010 -l smallGrid
+
+# Important: ApproximateQAgent is a subclass of QLearningAgent, and it therefore shares several methods like getAction. Make sure that your methods in QLearningAgent call getQValue instead of accessing Q-values directly, so that when you override getQValue in your approximate agent, the new approximate q-values are used to compute actions.
+
+# Once you’re confident that your approximate learner works correctly with the identity features, run your approximate Q-learning agent with our custom feature extractor, which can learn to win with ease:
+#   python pacman.py -p ApproximateQAgent -a extractor=SimpleExtractor -x 50 -n 60 -l mediumGrid
+
+# Even much larger layouts should be no problem for your ApproximateQAgent. (warning: this may take a few minutes to train)
+#   python pacman.py -p ApproximateQAgent -a extractor=SimpleExtractor -x 50 -n 60 -l mediumClassic
+
+# If you have no errors, your approximate Q-learning agent should win almost every time with these simple features, even with only 50 training games.
+
+# Grading: We will run your approximate Q-learning agent and check that it learns the same Q-values and feature weights as our reference implementation when each is presented with the same set of examples. To grade your implementation, run the autograder:
+#   python autograder.py -q q10
+
 
 class ApproximateQAgent(PacmanQAgent):
     """
@@ -283,14 +322,20 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        featureVector = self.featExtractor.getFeatures(state, action)
+        logging.debug(f"self.weights * featureVector = {self.weights * featureVector}")
+        return self.weights * featureVector
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        featureVector = self.featExtractor.getFeatures(state, action)
+        logging.debug(f"featureVector = {featureVector}")
+        difference = (reward + self.discount * self.getValue(nextState)) - self.getQValue(state, action)
+        for feature in featureVector:
+            self.weights[feature] += self.alpha * difference * featureVector[feature]
 
     def final(self, state):
         "Called at the end of each game."
