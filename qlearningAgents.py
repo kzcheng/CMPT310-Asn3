@@ -48,21 +48,22 @@ class QLearningAgent(ReinforcementAgent):
     """
 
     # Question 6: Q-Learning
+
     # Note that your value iteration agent does not actually learn from experience. Rather, it ponders its MDP model to arrive at a complete policy before ever interacting with a real environment. When it does interact with the environment, it simply follows the precomputed policy (e.g. it becomes a reflex agent). This distinction may be subtle in a simulated environment like a Gridword, but it’s very important in the real world, where the real MDP is not available.
 
     # You will now write a Q-learning agent, which does very little on construction, but instead learns by trial and error from interactions with the environment through its update(state, action, nextState, reward) method. A stub of a Q-learner is specified in QLearningAgent in qlearningAgents.py, and you can select it with the option -a q. For this question, you must implement the update, computeValueFromQValues, getQValue, and computeActionFromQValues methods.
+
     # Note: For computeActionFromQValues, you should break ties randomly for better behavior. The random.choice() function will help. In a particular state, actions that your agent hasn’t seen before still have a Q-value, specifically a Q-value of zero, and if all of the actions that your agent has seen before have a negative Q-value, an unseen action may be optimal.
 
     # Important: Make sure that in your computeValueFromQValues and computeActionFromQValues functions, you only access Q-values by calling getQValue. This abstraction will be useful for question 10 when you override getQValue to use features of state-action pairs rather than state-action pairs directly.
 
     # With the Q-learning update in place, you can watch your Q-learner learn under manual control, using the keyboard:
-    # python gridworld.py -a q -k 5 -m
+    #   python gridworld.py -a q -k 5 -m
 
-    # Recall that −𝑘 will control the number of episodes your agent gets to learn. Watch how the agent learns about the state it was just in, not the one it moves to, and ”leaves learning in its wake.” Hint: to help with debugging, you can turn off noise by using the − − 𝑛𝑜𝑖𝑠𝑒 0.0 parameter (though this obviously makes Q-learning less interesting). If you manually steer Pacman north and then east along the optimal path for four episodes, you should see the following Q-values.
+    # Recall that −k will control the number of episodes your agent gets to learn. Watch how the agent learns about the state it was just in, not the one it moves to, and ”leaves learning in its wake.” Hint: to help with debugging, you can turn off noise by using the `−−noise 0.0` parameter (though this obviously makes Q-learning less interesting). If you manually steer Pacman north and then east along the optimal path for four episodes, you should see the following Q-values.
 
     # Grading: We will run your Q-learning agent and check that it learns the same Q-values and policy as our reference implementation when each is presented with the same set of examples. To grade your implementation, run the autograder:
-
-    # python autograder.py -q q6
+    #   python autograder.py -q q6
 
     def __init__(self, **args):
         "You can initialize Q-values here..."
@@ -123,6 +124,31 @@ class QLearningAgent(ReinforcementAgent):
                 maxActions.append(action)
         maxAction = random.choice(maxActions)
         return maxAction
+
+    # Question 7: Epsilon Greedy
+
+    # Complete your Q-learning agent by implementing epsilon-greedy action selection in getAction, meaning it chooses random actions an epsilon fraction of the time, and follows its current best Q-values otherwise. Note that choosing a random action may result in choosing the best action - that is, you should not choose a random sub-optimal action, but rather any random legal action.
+
+    # You can choose an element from a list uniformly at random by calling the random.choice function. You can simulate a binary variable with probability p of success by using util.flipCoin(p), which returns True with probability p and False with probability 1 − p.
+
+    # After implementing the getAction method, observe the following behavior of the agent in gridworld (with epsilon = 0.3).
+    #   python gridworld.py -a q -k 100
+
+    # Your final Q-values should resemble those of your value iteration agent, especially along well-traveled paths. However, your average returns will be lower than the Q-values predict because of the random actions and the initial learning phase.
+
+    # You can also observe the following simulations for different epsilon values. Does that behavior of the agent match what you expect?
+    #   python gridworld.py -a q -k 100 --noise 0.0 -e 0.1
+    #   python gridworld.py -a q -k 100 --noise 0.0 -e 0.9
+
+    # To test your implementation, run the autograder:
+    #   python autograder.py -q q7
+
+    # With no additional code, you should now be able to run a Q-learning crawler robot:
+    #   python crawler.py
+
+    # If this doesn’t work, you’ve probably written some code too specific to the GridWorld problem and you should make it more general to all MDPs.
+
+    # This will invoke the crawling robot from class using your Q-learner. Play around with the various learning parameters to see how they affect the agent’s policies and actions. Note that the step delay is a parameter of the simulation, whereas the learning rate and epsilon are parameters of your learning algorithm, and the discount factor is a property of the environment.
 
     def getAction(self, state):
         """
