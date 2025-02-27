@@ -11,6 +11,9 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+# This assignment is completed by Kevin Cheng for the course CMPT 310 (Intro Artificial Intelligence) at Simon Fraser University
+# The repo for this assignment can be found at https://github.com/kzcheng/CMPT310-Asn3
+
 
 ######################
 # ANALYSIS QUESTIONS #
@@ -68,7 +71,7 @@ def question3e():
 def question8():
     answerEpsilon = None
     answerLearningRate = None
-    return 'NOT POSSIBLE' 
+    return 'NOT POSSIBLE'
     # return answerEpsilon, answerLearningRate
     # If not possible, return 'NOT POSSIBLE'
 
